@@ -73,10 +73,19 @@ class Utilities:
         return thumb_file
 
     @staticmethod
-    def generate_stream_link(media_msg):
-        file_id = media_msg.message_id
-        chat_id = media_msg.chat.id
-        return urljoin(Config.HOST, f"file/{chat_id}/{file_id}")
+    async def generate_stream_link(media_msg):
+        media_location = f"/app/bot/DOWNLOADS/{media_msg.from_user.id}{media_msg.message_id}/download.mkv"
+        if not os.path.exists(media_location):
+            status_msg = await media_msg.reply_text("**Downloading Media File....📥**", quote=True)
+            start_time = time.time()
+            media_location = await media_msg.download(
+                file_name=media_location,
+                progress=Utilities.progress_bar,
+                progress_args=(start_time, status_msg)
+            )
+            log.info(media_location)
+            await status_msg.delete()
+        return media_location
 
     @staticmethod
     async def get_media_info(file_link):
