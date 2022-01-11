@@ -91,9 +91,6 @@ class ScreenshotsProcess(BaseProcess):
 
             ffmpeg_cmd = [
                 "ffmpeg",
-                "-headers",
-                f"IAM:{Config.IAM_HEADER}",
-                "-hide_banner",
                 "-ss",
                 "",  # To be replaced in loop
                 "-i",
@@ -116,7 +113,7 @@ class ScreenshotsProcess(BaseProcess):
             with tempfile.TemporaryDirectory() as output_folder:
                 for i, sec in enumerate(screenshot_secs):
                     thumbnail_file = os.path.join(output_folder, f"{i+1}.png")
-                    ffmpeg_cmd[5] = str(sec)
+                    ffmpeg_cmd[2] = str(sec)
                     ffmpeg_cmd[-1] = thumbnail_file
                     log.debug(ffmpeg_cmd)
                     output = await Utilities.run_subprocess(ffmpeg_cmd)
@@ -159,7 +156,7 @@ class ScreenshotsProcess(BaseProcess):
                     raise ScreenshotsProcessFailure(
                         for_user=ms.SCREENSHOT_PROCESS_FAILED,
                         for_admin=ms.SCREENSHOTS_FAILED_GENERATION.format(
-                            file_link=self.file_link, num_screenshots=num_screenshots
+                            file_link=(self.file_link), num_screenshots=num_screenshots
                         ),
                         extra_details=error_file,
                     )
@@ -178,6 +175,10 @@ class ScreenshotsProcess(BaseProcess):
                         )
                     )
                 )
+                try:
+                    os.remove(self.file_link)
+                except: pass
+
         except ScreenshotsProcessFailure as e:
             log.error(e)
             await self.input_message.edit_message_text(e.for_user)

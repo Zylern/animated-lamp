@@ -72,9 +72,7 @@ class SampleVideoProcess(BaseProcess):
                 )
                 ffmpeg_cmd = [
                     "ffmpeg",
-                    "-headers",
-                    f"IAM:{Config.IAM_HEADER}",
-                    "-hide_banner",
+                    #"-hide_banner",
                     "-ss",
                     str(start_at),
                     "-i",
@@ -138,6 +136,9 @@ class SampleVideoProcess(BaseProcess):
                         )
                     )
                 )
+                try:
+                    os.remove(self.file_link)
+                except: pass
         except SampleVideoProcessFailure as e:
             log.error(e)
             await self.input_message.edit_message_text(text=e.for_user)

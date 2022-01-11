@@ -110,9 +110,6 @@ class TrimVideoProcess(BaseProcess):
 
                 ffmpeg_cmd = [
                     "ffmpeg",
-                    "-headers",
-                    f"IAM:{Config.IAM_HEADER}",
-                    "-hide_banner",
                     "-ss",
                     str(start),
                     "-i",
@@ -176,6 +173,10 @@ class TrimVideoProcess(BaseProcess):
                         )
                     )
                 )
+                try:
+                    os.remove(self.file_link)
+                except: pass
+
         except TrimVideoProcessFailure as e:
             log.error(e)
             await self.reply_message.edit_text(text=e.for_user)
